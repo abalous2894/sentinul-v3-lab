@@ -306,8 +306,6 @@ Use the dashboard to monitor:
 
 ## How to Use the Genesis Launch Features
 
-This section explains how to use the Genesis launch features at a workflow level without exposing private implementation details.
-
 ### Neural Mirror
 
 Use Neural Mirror before execution when you want to understand whether a proposed action is safe enough to proceed.
@@ -456,9 +454,6 @@ Recommended reading order:
 ---
 
 ## FAQ
-
-**Q: Does this README include Aegis or Genesis 1.1?**  
-No. This README is intentionally limited to the V5 foundation and the Genesis launch.
 
 **Q: Can I still use the older V5 features?**  
 Yes. Protocol Guard, Evidence Vault, Honeypot Mesh, and Universal Governance remain part of the platform and are still covered here.
