@@ -6,8 +6,6 @@ Current Version: 5.0.0 Genesis Sovereignty
 Tagline: Beyond Guardrails. Real-Time Sovereignty.  
 Status: Production-ready
 
-> This README covers the V5 platform foundation and the Genesis update launched today. It intentionally excludes Aegis and Genesis 1.1.
-
 ---
 
 ## Table of Contents
