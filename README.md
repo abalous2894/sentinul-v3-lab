@@ -1,1437 +1,506 @@
-# 🛡️ Sentinul: Genesis Sovereignty Edition
+# SENTINUL: SOVEREIGN SECURITY INFRASTRUCTURE
 
-**Enterprise-grade security verification for autonomous AI agents and multi-agent systems.**
+**Enterprise-Grade Enforcement for Autonomous AI Agents and Multi-Agent Systems**
 
-**Current Version:** 5.0.0 Genesis Sovereignty (Production Ready)  
-**Latest Edition:** Beyond Guardrails. Real-Time Sovereignty.  
-**Status:** ✅ All 4 Genesis Pillars active, fully tested, zero crashes
+**Version:** Genesis Phase 5 (Production)  
+**Edition:** Sovereign Security Infrastructure  
+**Status:** All 5 Enforcement Layers Active — Fully Hardened
 
-> This documentation covers both **V5 governance features** and **Genesis Sovereignty innovations** for complete platform mastery.
+> Beyond Guardrails. Real-Time Sovereignty.
+
+---
+
+## Overview
+
+Sentinul is a deterministic, multi-layer security enforcement platform for autonomous AI agents operating in production environments. The platform enforces a **Sovereign Workflow** — a non-negotiable operational contract where no agent action, LLM call, or MCP tool invocation can bypass the enforcement pipeline. Every operation is inspected, logged, and subject to fail-closed decisions.
+
+This is not a monitoring system. It is an enforcement system.
 
 ---
 
 ## Table of Contents
 
-1. [Quick Start (5 minutes)](#quick-start)
-2. [Genesis Sovereignty Features](#genesis-sovereignty-features)
-3. [Aegis Update](#aegis-update)
-4. [What's New in V5](#whats-new-in-v5)
-5. [Installation Guide](#installation-guide)
-6. [Understanding Sentinul Versions](#understanding-versions-v1-to-v5)
-7. [Core Architecture](#core-architecture)
-8. [Usage Guide](#usage-guide)
-9. [Genesis Pillar Usage Guide](#genesis-pillar-usage-guide)
-10. [BYOK (Bring Your Own Key) Integration](#byok-bring-your-own-key-integration)
-11. [Configuration](#configuration)
-12. [Troubleshooting](#troubleshooting)
+1. [The Sovereign Architecture](#1-the-sovereign-architecture)
+2. [Key Features](#2-key-features)
+   - [Skill Scanner](#skill-scanner)
+   - [Intent Binder](#intent-binder)
+   - [Chain Detector](#chain-detector)
+   - [LLM Proxy Adapter](#llm-proxy-adapter)
+3. [Installation](#3-installation)
+4. [Usage](#4-usage)
+   - [Proxied LLM Calls](#proxied-llm-calls)
+   - [Tool Registration and Skill Scanning](#tool-registration-and-skill-scanning)
+   - [Live Telemetry Dashboard](#live-telemetry-dashboard)
+5. [API Reference](#5-api-reference)
+6. [Security Mandate](#6-security-mandate)
+7. [Configuration](#7-configuration)
+8. [BYOK (Bring Your Own Key)](#8-byok-bring-your-own-key)
 
 ---
 
-## Quick Start
+## 1. The Sovereign Architecture
 
-### Fastest Way: Try Online (No Installation)
+Every LLM call, tool invocation, and agent action is forced through a **5-Layer Enforcement Gauntlet** before execution and again upon response. Layers execute sequentially; a block at any layer terminates the operation immediately and emits an immutable audit record. There is no bypass path.
 
-Visit **https://sentinul.app** to test the Twin-Core Sanitizer instantly with your code.
+```
+INBOUND REQUEST
+       │
+       ▼
+┌─────────────────────┐
+│  LAYER 1: INTENT    │  Neural Mirror + Intent Binder
+│                     │  Real-time prompt risk-scoring; semantic alignment
+│  Pre-call intent    │  verification; jailbreak detection; persona-override
+│  verification       │  blocking; divergence analysis against declared context
+└────────┬────────────┘
+         │ PASS
+         ▼
+┌─────────────────────┐
+│  LAYER 2: SKILL     │  Skill Scanner — Proprietary Sovereign Logic
+│                     │  Static analysis of tool payloads and prompt content;
+│  Supply-chain gate  │  exfiltration-probe detection; code-injection pattern
+│  for all tools      │  detection; supply-chain poisoning signals
+└────────┬────────────┘
+         │ PASS
+         ▼
+┌─────────────────────┐
+│  LAYER 3: ROUTING   │  Routing Validator
+│                     │  Pre-call cryptographic lock binding the declared model
+│  Model routing      │  to the session; post-response verification that the
+│  integrity lock     │  correct model identity actually responded
+└────────┬────────────┘
+         │ PASS
+         ▼
+    ── LLM CALL ──
+         │
+         ▼
+┌─────────────────────┐
+│  LAYER 4: RESPONSE  │  Response Binder — Proprietary Sovereign Logic
+│                     │  Indirect prompt-injection detection; instruction
+│  Post-call LLM      │  override signals; goal hijacking; persona replacement;
+│  response guard     │  exfiltration-probe detection in LLM output
+└────────┬────────────┘
+         │ PASS
+         ▼
+┌─────────────────────┐
+│  LAYER 5: CHAIN     │  Chain Detector — Proprietary Sovereign Logic
+│                     │  Stateful, session-scoped behavioral sequencing;
+│  Cross-turn attack  │  detects Salami Slicing, credential-harvesting chains,
+│  sequence analysis  │  and multi-turn permission escalation campaigns
+└────────┬────────────┘
+         │ PASS
+         ▼
+  RESPONSE DELIVERED
+```
 
-### Local Installation (5 minutes)
+Any layer returning a `CRITICAL` block produces:
 
-#### Prerequisites
-- Node.js 16+ or Python 3.9+
-- Git
-- Docker (optional, for isolated testing)
+- `HTTP 403` with `blockPhase` and `blockReason` in the response body
+- An immutable audit log entry
+- A real-time event on the Sovereign SSE governance stream
 
-#### Option 1: Python Backend (Current Release)
+---
+
+## 2. Key Features
+
+### Skill Scanner
+
+The Skill Scanner is the mandatory execution gate for all MCP tool calls and LLM prompt content entering the enforcement pipeline. It applies **Proprietary Sovereign Logic** to perform static analysis of every tool payload and prompt, detecting:
+
+- Code-injection and command-injection patterns
+- Data exfiltration probes and exfiltration-staged payloads
+- Prompt-injection attempts embedded in tool arguments
+- Supply-chain poisoning signals in third-party tool definitions
+
+**Verdicts:** `TRUSTED` | `SUSPICIOUS` | `UNTRUSTED`
+
+An `UNTRUSTED` verdict is an immediate, fail-closed block. `SUSPICIOUS` verdicts are logged and forwarded to the Chain Detector for session-level sequence analysis.
+
+Every MCP tool execution is gated through the Skill Scanner before the tool runs. This is not configurable — it is the enforcement contract.
+
+---
+
+### Intent Binder
+
+The Intent Binder performs real-time semantic alignment verification of agent reasoning against the declared operation context. It operates as an Express middleware, evaluating every privileged request that carries a reasoning descriptor, before any route handler is invoked.
+
+It detects:
+
+- Jailbreak attempts: instruction-override injections, persona activation attacks
+- Prompt injection targeting system-level directives
+- Semantic divergence between declared reasoning and the actual operation type
+
+**Divergence levels:** `ALIGNED` | `WARNING` | `SUSPICIOUS` | `CRITICAL`
+
+A `CRITICAL` divergence terminates the request at the middleware layer — `HTTP 403` is returned before the route handler executes. The `blockOnCritical` enforcement posture is always active and is not a runtime option.
+
+---
+
+### Chain Detector
+
+The Chain Detector maintains stateful, session-scoped behavioral records across conversation turns. Its purpose is to identify **attack sequences** — coordinated patterns that exploit the fact that individual turns appear innocuous when evaluated in isolation.
+
+Attack patterns detected include:
+
+- **Salami Slicing:** Incremental privilege escalation where each turn stays below the individual block threshold
+- **Credential Harvesting Chains:** Progressive tool calls that collectively stage a data exfiltration
+- **Permission Escalation Sequences:** Multi-turn attempts to widen scope beyond original task authorization
+
+Every enforcement event across all five layers feeds the Chain Detector for the active session. A detected chain fires a `CHAIN_DETECTION_VIOLATION` event on the governance stream and quarantines the session.
+
+---
+
+### LLM Proxy Adapter
+
+The Proxy Adapter is the fail-closed gateway for all proxied LLM calls. It is the single point through which every model invocation must pass. The Adapter orchestrates all five enforcement layers and enforces provider-aware API key resolution — **API keys are never accepted in the request body**.
+
+**Supported providers, detected automatically from the endpoint hostname:**
+
+| Provider | Hostname |
+|---|---|
+| OpenAI | `api.openai.com` |
+| Anthropic | `api.anthropic.com` |
+| Google Gemini | `generativelanguage.googleapis.com` |
+| Generic (any OpenAI-compatible) | all other hostnames |
+
+**API key resolution order** (server-side only):
+
+1. `X-LLM-Api-Key` request header
+2. `ANTHROPIC_API_KEY` env var (for Anthropic endpoints)
+3. `GEMINI_API_KEY` env var (for Gemini endpoints)
+4. `OPENAI_API_KEY` env var (for OpenAI endpoints)
+5. `LLM_API_KEY` env var (generic fallback)
+
+**SSRF protection** is unconditional: private IP ranges (RFC 1918), link-local (RFC 3927), and CGNAT addresses are always blocked. `localhost` is permitted only in non-production environments.
+
+**Block phases** — where in the pipeline the call was terminated:
+
+| Phase | Trigger |
+|---|---|
+| `SSRF` | Endpoint failed SSRF/private-range validation |
+| `NEURAL` | Neural Mirror returned a high-risk score |
+| `INTENT` | Intent Binder blocked (jailbreak or CRITICAL divergence) |
+| `SKILL_SCAN` | Skill Scanner returned `UNTRUSTED` verdict |
+| `RESPONSE` | Response Binder blocked the LLM output |
+| `ROUTING` | Routing Validator detected model substitution |
+
+The Proxy Adapter returns the same `HTTP 403` shape for any block phase. It does not surface distinguishing error signals that would allow a caller to probe which enforcement layer was triggered.
+
+---
+
+## 3. Installation
+
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL (via Prisma)
+- Docker (recommended for production)
+
+### Backend
 
 ```bash
-# Clone the repository
-git clone https://github.com/abalous2894/sentinul-v3-lab.git
-cd sentinul-v3-lab/sentinul-v3-lab
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the security server
-python src/app.py
-
-# Server runs on http://localhost:5000
-# API docs at http://localhost:5000/api/docs
-```
-
-#### Option 2: Docker (Recommended for Production)
-
-```bash
-# Build container
-docker build -t sentinul:5.0.0 .
-
-# Run with persistent volume
-docker run -d \
-  --name sentinul \
-  -p 5000:5000 \
-  -v /var/lib/sentinul:/data \
-  sentinul:5.0.0
-
-# Check logs
-docker logs -f sentinul
-```
-
-#### Option 3: Node.js (Legacy Support)
-
-```bash
-cd sentinul-v3-lab/sentinul-app-site
-npm install
-npm run dev
-
-# Frontend runs on http://localhost:3000
-```
-
----
-
-## Genesis Sovereignty Features
-
-**Sentinul Genesis Sovereignty** introduces four autonomous subsystems, each targeting a distinct attack surface. Combined with V5's foundational phases, these pillars deliver real-time sovereignty over AI agent behavior.
-
-### 🧠 Pillar 1: Neural Mirror (Trajectory Analysis)
-
-Real-time trajectory analysis for AI agent decision-making patterns. Detects drift, anomalies, and reasoning inconsistencies.
-
-**What it does:**
-- Captures 50+ dimensional vector space of agent intent
-- Identifies deviation from learned behavior baseline
-- Triggers alerts when trajectory diverges >15%
-
-**Usage Example:**
-
-```bash
-# Check agent trajectory health
-curl http://localhost:5000/api/v1/pillars/neural-mirror \
-  -H "Authorization: Bearer YOUR_KEY" \
-  -X GET
-
-# Response:
-{
-  "status": "active",
-  "agent_id": "data-analyst-prod",
-  "trajectory_dims": 50,
-  "baseline_consistency": 0.98,
-  "current_drift": 0.03,
-  "alert_threshold": 0.15,
-  "verdict": "NOMINAL"
-}
-```
-
-**Python Integration:**
-
-```python
-from sentinul import NeuralMirror
-
-mirror = NeuralMirror(agent_id="data-analyst-prod")
-
-# Capture decision trajectory
-trajectory = mirror.capture_trajectory(
-    agent_action="query_database",
-    context={"user": "john@company.com", "table": "customers"}
-)
-
-# Check if within normal bounds
-if trajectory.drift_from_baseline > 0.15:
-    print("⚠️ Alert: Agent behavior diverging from baseline")
-    mirror.escalate_to_operator()
-else:
-    print("✅ Agent behavior nominal")
-```
-
----
-
-### 🔗 Pillar 2: Intent Binder (Cryptographic Commitment)
-
-Immutable intent binding using RSA-2048 signatures. Ensures agent commitment to declared action cannot be repudiated.
-
-**What it does:**
-- Signs agent intent with RSA-2048 private key
-- Verifies signature before execution
-- Prevents "I didn't mean to do that" denials
-
-**Usage Example:**
-
-```bash
-# Thaw (unlock) intent for execution
-curl -X POST http://localhost:5000/api/v1/pillars/intent-binder/thaw \
-  -H "Content-Type: application/json" \
-  -d '{
-    "intent_id": "int-xyz789",
-    "agent_id": "data-analyst-prod",
-    "action": "delete_table",
-    "scope": "staging_db",
-    "ttl": 3600
-  }'
-
-# Response:
-{
-  "status": "thawed",
-  "signature_valid": true,
-  "expires_at": "2026-03-16T15:32:00Z",
-  "audit_log_id": "audit-556"
-}
-```
-
-**Python Integration:**
-
-```python
-from sentinul import IntentBinder
-
-binder = IntentBinder(agent_id="data-analyst-prod")
-
-# Bind intent (creates commitment)
-sealed_intent = binder.bind_intent(
-    action="write_to_database",
-    table="audit_log",
-    rows_affected=50,
-    reason="Compliance audit export"
-)
-
-# Later: Thaw (execute) the intent
-thawed = binder.thaw(intent_id=sealed_intent.id)
-
-if thawed.signature_valid:
-    print("✅ Intent verified, safe to execute")
-    execute_action()
-else:
-    print("❌ Signature invalid - intent tampered with")
-```
-
----
-
-### 🔄 Pillar 3: Swarm Immunity (Distributed Consensus)
-
-Multi-agent gossip protocol for cross-validation. Each agent broadcasts its state; majority consensus required for risky ops.
-
-**What it does:**
-- Agents share threat intelligence in real-time
-- Broadcasts take <150ms across swarm
-- Majority vote required for high-risk actions
-
-**Usage Example:**
-
-```bash
-# Broadcast agent state to swarm
-curl -X POST http://localhost:5000/api/v1/pillars/swarm-immunity/broadcast \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": "data-analyst-prod",
-    "state": "healthy",
-    "threat_detected": "prompt_injection_attempt",
-    "timestamp": "2026-03-16T14:32:00Z"
-  }'
-
-# Response:
-{
-  "broadcast_id": "bcast-123",
-  "peers_received": 12,
-  "consensus_reached": true,
-  "consensus_verdict": "THREAT_CONFIRMED"
-}
-```
-
-**Python Integration:**
-
-```python
-from sentinul import SwarmImmunity
-
-swarm = SwarmImmunity(agent_id="data-analyst-prod", swarm_size=15)
-
-# Propose action to swarm
-proposal = {
-    "action": "export_sensitive_data",
-    "target": "s3://backup/users",
-    "size_mb": 2500
-}
-
-consensus = swarm.request_consensus(proposal)
-
-if consensus.verdict == "ALLOW":
-    print(f"✅ {consensus.votes_for}/{consensus.total_peers} peers approved")
-    execute_export()
-elif consensus.verdict == "BLOCK":
-    print(f"❌ {consensus.votes_against}/{consensus.total_peers} peers rejected")
-    print(f"Reason: {consensus.reason_summary}")
-```
-
----
-
-### 🔍 Pillar 4: Recursive Auditor (Chain-of-Custody Analysis)
-
-Deep introspection of agent reasoning chains. Analyzes each step of decision-making to detect hidden objectives.
-
-**What it does:**
-- Captures agent chain-of-thought reasoning
-- Detects deviations from declared intent
-- Triggers MFA if reasoning deviates
-
-**Usage Example:**
-
-```bash
-# Analyze agent's reasoning chain
-curl -X POST http://localhost:5000/api/v1/pillars/recursive-auditor/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": "data-analyst-prod",
-    "tool_name": "query_database",
-    "declared_intent": "Generate Q1 revenue report",
-    "reasoning_chain": [
-      "Step 1: Validate query scope",
-      "Step 2: Check user permissions",
-      "Step 3: Execute query",
-      "Step 4: Format results"
-    ]
-  }'
-
-# Response:
-{
-  "analysis_id": "audit-778",
-  "reasoning_valid": true,
-  "deviation_detected": false,
-  "confidence": 0.99,
-  "verdict": "INTENT_MATCH"
-}
-```
-
-**Python Integration:**
-
-```python
-from sentinul import RecursiveAuditor
-
-auditor = RecursiveAuditor(agent_id="data-analyst-prod")
-
-# Capture and analyze reasoning
-analysis = auditor.analyze_reasoning(
-    declared_intent="Export monthly sales report",
-    reasoning_steps=[
-        "Query sales table with date range",
-        "Filter for Q1 2026",
-        "Calculate totals by region",
-        "Export to CSV"
-    ]
-)
-
-if analysis.deviation_detected:
-    print(f"⚠️ Deviation found: {analysis.detected_deviation}")
-    print(f"Extra steps: {analysis.extra_steps}")
-    auditor.request_mfa_approval()
-else:
-    print(f"✅ Reasoning matches declared intent (confidence: {analysis.confidence})")
-```
-
----
-
-### The Gauntlet: 4/4 IRONCLAD Red-Team Verdict
-
-Genesis Sovereignty was subjected to structured four-vector red-team engagement. All attacks were neutralized:
-
-| Attack Vector | Threat | Defense | Verdict |
-|:----|:----|:----|:----|
-| **Drift Stealth** | Agent hides behavior change in neural trajectory | Neural Mirror detects >2% drift baseline | ✅ BLOCKED |
-| **Mirror Blindspot** | Agent commits to action then changes behavior | Intent Binder signature prevents repudiation | ✅ BLOCKED |
-| **Identity Cloning** | Attacker claims to be trusted agent | Swarm consensus cross-validates peer identity | ✅ BLOCKED |
-| **Swarm Eclipse** | Attacker isolates one agent to control it | Recursive Auditor detects solo reasoning anomaly | ✅ BLOCKED |
-
-**Combined Security Posture:** 4/4 vectors defended = **IRONCLAD**
-
----
-
-### Deployment Readiness
-
-| Metric | Target | Status |
-|:----|:----|:----|
-| Health Score | ≥95/100 | ✅ 95/100 |
-| Swarm Latency | <150ms | ✅ <150ms |
-| Vectors Defended | 4/4 | ✅ 4/4 |
-| Cryptographic Standard | RSA-2048+ | ✅ RSA-2048 |
-| Hash Algorithm | SHA-256+ | ✅ SHA-256 |
-| Integration Tests | 8/8 passing | ✅ 8/8 passing |
-
----
-
-## Aegis Update
-
-The **Aegis update** extends the Genesis and V5 foundation with stronger operator controls, clearer runtime governance, and a more production-ready security posture for high-trust deployments.
-
-This public README intentionally stays at the product-update level. Launch-specific implementation details are being withheld until formal release.
-
-### What the Aegis Update Adds
-
-- Stronger runtime oversight for sensitive workflows
-- Clearer operator visibility into governed activity
-- Better support for controlled intervention and review
-- Expanded audit and evidence handling for production environments
-- Tighter alignment between security operations and compliance workflows
-
-> **Thesis Shift:** Traditional security uses "Guardrails" (passive filtering). The Aegis Update introduces "Authority" (active execution control). We don't just watch the agent; we authorize the action.
-
-### Recommended Public Positioning
-
-Use the Aegis update to describe Sentinul as moving beyond passive monitoring toward a more active governance model for autonomous and semi-autonomous systems.
-
-At a public level, the update should be framed around:
-
-- safer execution of sensitive workflows
-- improved reviewability of important actions
-- stronger deployment confidence for enterprise environments
-- more mature operational controls for security teams
-
-### Adoption Guidance
-
-For teams evaluating the Aegis update:
-
-1. Start with the existing Genesis and V5 controls already documented in this repository.
-2. Apply the Aegis update to high-sensitivity workflows first.
-3. Validate operational logging, review paths, and evidence exports in staging before production rollout.
-4. Keep internal launch-day architecture and enforcement details restricted to private deployment documentation.
-
-### Scope Note
-
-This repository documents the **public governance protocol, feature posture, and integration direction** for the Aegis update.
-
-Deeper implementation details, internal enforcement mechanics, and launch-day architecture remain private until public release.
-
----
-
-
-
-### 🔐 Phase 1: Protocol Guard (Runtime Defense)
-- **Twin-Core Sanitizer:** SQL injection + hardcoded secrets detection
-- **Unicode normalization:** Prevents encoding bypasses
-- **Real-time risk scoring:** 0-100 scale with context
-- **Performance:** <0.04ms per scan
-
-### 📜 Phase 2: Evidence Vault (Cryptographic Audit Trail)
-- **Hash-chained SQLite:** Immutable event ledger
-- **SHA-256 chaining:** Blockchain-style integrity
-- **Tamper detection:** Automatic verification
-- **Compliance ready:** JSON-LD export for auditors
-
-### 🍯 Phase 3: Honeypot Mesh (Deception Detection)
-- **15 shadow skills:** Admin override, evidence deletion, privilege escalation
-- **Behavioral extraction:** Chain-of-thought reasoning capture
-- **Automatic compromise detection:** Agent status flagging
-- **MFA escalation:** Operator approval for suspicious actions
-
-### 🏛️ Phase 4: Universal Governance (Fleet Management)
-- **Centralized policy engine:** YAML-based rule configuration
-- **Hot-reload capability:** Policy updates without restarts
-- **Fleet monitoring:** Multi-agent dashboard
-- **Identity attestation:** Unique Skill IDs + JWT tokens
-- **Emergency kill-switch:** Revoke all agents instantly
-
----
-
-## Installation Guide
-
-### Detailed Setup for Each Component
-
-#### Backend Installation
-
-```bash
-# 1. Clone and enter project
-git clone https://github.com/abalous2894/sentinul-v3-lab.git
-cd sentinul-v3-lab/private-backend
-
-# 2. Create virtual environment (Python 3.9+)
-python -m venv venv
-source venv/bin/activate  # Or: venv\Scripts\activate on Windows
-
-# 3. Install Python dependencies
-pip install -r requirements.txt
-
-# 4. Configure environment
-cp .env.example .env
-# Edit .env with your settings:
-#   POLICY_FILE=sentinul_policy.yaml
-#   VAULT_PATH=./data/evidence_vault.db
-#   DEBUG=false
-
-# 5. Initialize database
-python src/setup_vault.py
-
-# 6. Start server
-python src/app.py
-```
-
-**Expected Output:**
-```
-Sentinul V5 Backend Server
-DEBUG: Policy loaded from sentinul_policy.yaml
-DEBUG: Evidence Vault initialized at ./data/evidence_vault.db
-DEBUG: 15 honeypot skills registered
-INFO: Server started on http://localhost:5000
-```
-
-#### Frontend Installation
-
-```bash
-# From project root
-cd sentinul-app-site
-
-# Install dependencies
+cd private-backend
 npm install
 
-# Development mode
-npm run dev
-# Frontend available at http://localhost:3000
+# These three are required — the server performs startup validation
+# and will exit with a FATAL error if any are missing or undersized.
+export JWT_SECRET="<minimum 64 characters>"
+export INTERNAL_SERVICE_KEY="<minimum 32 characters>"
+export ENCRYPTION_KEY="<minimum 32 characters>"
 
-# Production build
-npm run build
+# Provider API keys (resolved automatically by the Proxy Adapter)
+export OPENAI_API_KEY="..."
+export ANTHROPIC_API_KEY="..."
+export GEMINI_API_KEY="..."
+
 npm start
 ```
 
-#### Running Integration Tests
+The server performs fail-closed startup validation. A missing `JWT_SECRET`, `INTERNAL_SERVICE_KEY`, or undersized `ENCRYPTION_KEY` causes an immediate `process.exit(1)` with a diagnostic message. The server will not start in a degraded or fail-open state under any condition.
+
+### Dashboard
 
 ```bash
-cd private-backend/src
-
-# Run Phase 4 Final Test (governance + fleet)
-python PHASE_4_FINAL_TEST.py
-
-# Run Global Integration Test (all 4 phases)
-python GLOBAL_V5_INTEGRATION_TEST_FINAL.py
-
-# Both should show: ✅ 8/8 tests passing
+cd sentinul-dashboard
+npm install
+npm run dev
+# Runs on http://localhost:5173
 ```
 
----
-
-## Understanding Versions: V1 to V5
-
-### 📍 V1: Foundation (Static Analysis)
-**Release Focus:** Core vulnerability detection
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| SQL Injection Detection | ✅ | Pattern-based regex matching |
-| Hardcoded Secrets Detection | ✅ | API key/password scanning |
-| CWE Mapping | ✅ | Links to CVE database |
-| Risk Scoring | ✅ | 0-100 scale classification |
-
-**Install:** Historical artifact (use V5 instead)
-
-**Key Document:** [TWIN-CORE-PROTOCOL.md](./TWIN-CORE-PROTOCOL.md)
-
----
-
-### 📍 V2: Digital Twin (Verification)
-**Release Focus:** Proof that fixes actually work
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Ephemeral agent environment | ✅ | Docker-based isolated testing |
-| Attack vector simulation | ✅ | Proof-of-concept injection tests |
-| GitHub PR integration | ✅ | "Sentinul Verified" badges |
-| Compliance compliance markers | ✅ | SOC2/HIPAA/GDPR/PCI-DSS |
-
-**Use Case:** Before merging security fixes, prove they work
-
-**Migration Path:** V1 users see additional verification step automatically
-
-**Key Document:** [MULTI-AGENT-SECURITY.md](./MULTI-AGENT-SECURITY.md)
-
----
-
-### 📍 V3: Multi-Agent Security (Autonomous Detection)
-**Release Focus:** Honeypot-based threat detection
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Shadow Skills (13+ honeypots) | ✅ | Deception mesh for detection |
-| Behavioral reasoning extraction | ✅ | Capture LLM chain-of-thought |
-| Compromise detection | ✅ | Flag agents attempting jailbreaks |
-| Automatic MFA escalation | ✅ | Operator approval workflow |
-
-**Use Case:** Real-time detection when agents attempt jailbreaks or exploits
-
-**New in V3:**
-```python
-# Honeypot trigger example
-@sentinul_honeypot("admin_system_override")
-def admin_override(params):
-    # Agent attempting to call this = DETECTED ✓
-    pass
-```
-
-**Key Document:** [COMPLIANCE-MAPPING.md](./COMPLIANCE-MAPPING.md)
-
----
-
-### 📍 V4: Fleet Governance (Centralized Control)
-**Release Focus:** Multi-agent fleet management
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Centralized policy engine | ✅ | YAML-based rules (all agents) |
-| Policy hot-reload | ✅ | Updates take effect instantly |
-| Fleet monitoring dashboard | ✅ | Real-time health, violations, threats |
-| Identity attestation (JWT) | ✅ | Skill fingerprints + On-Behalf-Of tokens |
-| Emergency kill-switch | ✅ | Revoke all agents with one command |
-
-**Use Case:** Manage 50+ agents with single unified policy
-
-**Policy Configuration** (`sentinul_policy.yaml`):
-```yaml
-global:
-  version: "4.0.0"
-  default_action: "allow"
-  mfa_threshold: 75
-
-allowed_tool_patterns:
-  - "^read_.*$"        # All read operations
-  - "^query_.*$"       # All queries
-  - "^analyze_.*$"     # All analysis
-
-blocked_tool_patterns:
-  - "^delete_.*$"      # No destructive ops
-  - "^admin_.*$"       # No admin access
-  - "^system_.*$"      # No system-level
-```
-
-**Key Document:** See [private-backend/PHASE_4_COMPLETION_SUMMARY.md](../private-backend/PHASE_4_COMPLETION_SUMMARY.md)
-
----
-
-### 📍 V5: Production Hardening (Current Release)
-**Release Focus:** Security audit → Production ready
-
-| Feature | Status | Description |
-|---------|--------|-------------|
-| Protocol Guard Phase 1 | ✅ | Enhanced sanitizer + Unicode handling |
-| Evidence Vault Phase 2 | ✅ | Cryptographic audit trail (SHA-256 chaining) |
-| Honeypot Mesh Phase 3 | ✅ | Frozen registry, graceful error handling |
-| Universal Governance Phase 4 | ✅ | Fail-closed policies, fleet aggregation |
-| Global Integration Test | ✅ | 8/8 tests pass, all systems harmonized |
-
-**Major Improvements:**
-- ✅ 6 security audit findings remediated
-- ✅ Unicode normalization in sanitizer
-- ✅ Frozen honeypot registry (immutable after init)
-- ✅ Fail-closed policy engine (blocks by default if policy unavailable)
-- ✅ Graceful vault error handling (local backup if vault fails)
-- ✅ Latency optimized (<12ms per round-trip)
-
-**Zero Crashes:** 8/8 integration tests passing
-
-**Deploy Now:** Production-ready with all phases synchronized
-
----
-
-## Core Architecture
-
-### System Design Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SENTINUL V5 ARCHITECTURE                 │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┏━━━━━━━━━━━━━━━━━━┓                                        │
-│  ┃  Phase 1         ┃                                        │
-│  ┃  Protocol Guard  ┃  • Twin-Core Sanitizer                │
-│  ┃  (guard.py)      ┃  • SQL/Secrets Detection              │
-│  ┗━━━━┳━━━━━━━━━━━━┛  • Unicode Normalization              │
-│       │                • Risk Scoring (0-100)               │
-│       │ security_event                                      │
-│       │                                                     │
-│  ┏━━━━▼━━━━━━━━━━━━┓                                        │
-│  ┃  Phase 2         ┃                                        │
-│  ┃  Evidence Vault  ┃  • SQLite Hash-Chain                  │
-│  ┃ (vault.db)       ┃  • SHA-256 Linking                    │
-│  ┗━━━━╋━━━━━━━━━━━━┛  • Immutable Audit Trail              │
-│       │                • Query API                          │
-│       │ event_hash                                          │
-│       │                                                     │
-│  ┏━━━━▼━━━━━━━━━━━━┓  ┌─────────────────────┐               │
-│  ┃  Phase 3         ┃  │  Phase 3B: MFA      │               │
-│  ┃  Honeypot Mesh   ┃  │  Challenge          │               │
-│  ┃ (shadow_skills   ┃──┤  (mfa_challenge.py) │               │
-│  ┃  deception_hook) ┃  │  • Operator Approval │               │
-│  ┗━━━━╋━━━━━━━━━━━━┛  │  • JWT Validation   │               │
-│       │                └─────────────────────┘               │
-│       │ honeypot_event                                      │
-│       │                                                     │
-│  ┏━━━━▼━━━━━━━━━━━━┓                                        │
-│  ┃  Phase 4         ┃                                        │
-│  ┃  Governance      ┃  • Policy Engine (YAML)               │
-│  ┃ (policy_engine   ┃  • Fleet Monitor                      │
-│  ┃  identity_bridge ┃  • Dashboard API                      │
-│  ┃  dashboard_api)  ┃  • Identity Registry                  │
-│  ┗━━━━━━━━━━━━━━━━━┛  • Emergency Kill-Switch              │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Data Flow Example
-
-```
-User submits agent code
-    ↓
-Phase 1: Guard scans for patterns
-    ↓ (SAFE)
-Phase 2: Vault stores event with SHA-256 hash
-    ↓
-Phase 3: Check if code matches any honeypots
-    ↓ (Honeypot hit detected)
-Phase 3B: Escalate to MFA challenge
-    ↓ (Operator approves/denies)
-Phase 4: Dashboard shows violation in fleet context
-    ↓
-✅ Event logged with full chain integrity
-   (can be audited by third parties)
-```
-
----
-
-## Usage Guide
-
-### Basic Usage: Scanning Code
-
-#### Via API
+### Docker (Production)
 
 ```bash
-# Scan code for vulnerabilities
-curl -X POST http://localhost:5000/api/v1/scan \
+docker build -t sentinul:genesis .
+docker run -d \
+  --name sentinul \
+  -p 5000:5000 \
+  -e JWT_SECRET="..." \
+  -e INTERNAL_SERVICE_KEY="..." \
+  -e ENCRYPTION_KEY="..." \
+  sentinul:genesis
+```
+
+---
+
+## 4. Usage
+
+### Proxied LLM Calls
+
+All production LLM calls must be routed through the Proxy Adapter. Direct calls to LLM provider APIs that bypass this endpoint are outside the enforcement perimeter.
+
+```bash
+curl -X POST https://your-backend/api/v1/genesis/proxy/call \
+  -H "Authorization: Bearer <JWT>" \
+  -H "Content-Type: application/json" \
+  -H "X-LLM-Api-Key: <provider-api-key>" \
+  -d '{
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "model": "gpt-4o",
+    "messages": [
+      { "role": "system", "content": "You are a compliance auditor." },
+      { "role": "user",   "content": "Summarize the attached contract." }
+    ],
+    "sessionId": "sess_abc123"
+  }'
+```
+
+**Blocked response (`HTTP 403`):**
+
+```json
+{
+  "blocked": true,
+  "blockPhase": "INTENT",
+  "blockReason": "Jailbreak pattern detected (score 0.95)",
+  "callId": "f3a19c...",
+  "model": "gpt-4o",
+  "timestamp": "2026-03-26T12:00:00.000Z"
+}
+```
+
+**Clean response (`HTTP 200`):**
+
+```json
+{
+  "blocked": false,
+  "response": {
+    "id": "chatcmpl-...",
+    "choices": [{ "message": { "role": "assistant", "content": "..." } }]
+  },
+  "neuralRiskScore": 12,
+  "intentVerdict": "ALIGNED",
+  "skillScanVerdict": "TRUSTED",
+  "routingIntact": true,
+  "responseVerdict": "CLEAN",
+  "durationMs": 843
+}
+```
+
+---
+
+### Tool Registration and Skill Scanning
+
+Before deploying a tool or MCP server for agent use, submit its definition payload for a Skill Scan. Payloads that return `UNTRUSTED` are not permitted to execute in the enforcement pipeline.
+
+```bash
+curl -X POST https://your-backend/api/v1/skill-scan \
+  -H "Authorization: Bearer <JWT>" \
   -H "Content-Type: application/json" \
   -d '{
-    "code": "SELECT * FROM users WHERE id = $user_id",
-    "language": "python",
-    "context": "agent_skill"
+    "toolName": "filesystem_read",
+    "agentId": "agent-prod-001",
+    "payload": "<tool definition or code payload as string>"
   }'
+```
 
-# Response:
+**Response:**
+
+```json
 {
-  "risk_score": 75,
-  "violations": [
-    {
-      "type": "SQL_INJECTION",
-      "severity": "HIGH",
-      "cwe": "CWE-89",
-      "location": "line 5",
-      "fix": "Use parameterized query"
-    }
-  ],
-  "compliance_impact": {
-    "SOC2": "FAIL",
-    "HIPAA": "FAIL",
-    "GDPR": "FAIL",
-    "PCI_DSS": "FAIL"
-  }
+  "verdict": "TRUSTED",
+  "safety_score": 98,
+  "static_findings": [],
+  "scannedAt": "2026-03-26T12:00:00.000Z"
 }
 ```
 
-#### Via Python SDK
-
-```python
-from sentinul import Guard, EvidenceVault
-
-# Initialize guard
-guard = Guard(agent_id="data-analyst", skill_id="abc123")
-
-# Scan code
-result = guard.sanitize_and_execute(
-    tool_name="query_database",
-    parameters={"query": user_input},
-    user_id="john@company.com"
-)
-
-# Check result
-if result.blocked:
-    print(f"⛔ Blocked: {result.reason}")
-    # Event automatically logged to Evidence Vault
-else:
-    print("✅ Allowed")
-```
-
-### Advanced Usage: Fleet Management
-
-#### Deploy Multi-Agent System
-
-```python
-from sentinul import FleetMonitor, PolicyEngine
-
-# Initialize fleet
-fleet = FleetMonitor()
-policy = PolicyEngine.load_policy("sentinul_policy.yaml")
-
-# Register agents
-fleet.register_agent("agent-alpha", skill_id="fp-alpha")
-fleet.register_agent("agent-beta", skill_id="fp-beta")
-fleet.register_agent("agent-gamma", skill_id="fp-gamma")
-
-# Get fleet health
-health = fleet.get_fleet_health()
-print(f"Fleet health: {health.value}")
-# Output: "secure" or "alert" or "emergency"
-
-# Get violations
-violations = fleet.get_violations(hours=24)
-for violation in violations:
-    print(f"{violation.agent_id}: {violation.violation_type}")
-```
-
-#### Update Policy Without Restarting
-
-```python
-# Edit sentinul_policy.yaml
-# (agents auto-detect change via hash comparison)
-
-# Verify policy hot-reload worked
-curl http://localhost:5000/api/v1/policy/status
-
-# Response:
-{
-  "version": "2.0.0",
-  "updated_at": "2026-03-15T14:32:00Z",
-  "agents_synced": 3,
-  "enforcement_active": true
-}
-```
-
-### Using the Dashboard
-
-```
-http://localhost:5000/dashboard
-│
-├─ Fleet Overview
-│  ├─ Agents: 3 healthy, 0 degraded, 0 offline
-│  ├─ Violations: 0 today
-│  └─ Chain Integrity: ✅ Valid
-│
-├─ Violations This Week
-│  ├─ Agent Alpha: SQL Injection attempt (blocked)
-│  ├─ Agent Beta: Prompt Injection attempt (blocked)
-│  └─ Agent Gamma: Clean
-│
-└─ Policy Management
-   ├─ Current: v2.0.0 (effective 3 hours ago)
-   ├─ Previous: v1.0.0 (retired)
-   └─ [Edit Policy] [Deploy Now]
-```
+An `UNTRUSTED` verdict includes a `static_findings` array identifying detected signal categories. The category labels describe the class of threat detected. The detection logic itself is **Proprietary Sovereign Logic** and is intentionally not exposed — enforcement decisions are deterministic and fully auditable; the detection mechanism is not enumerable.
 
 ---
 
-## Genesis Pillar Usage Guide
+### Live Telemetry Dashboard
 
-This section provides detailed examples for working with all four Genesis Sovereignty pillars in production environments.
+The Sovereign Dashboard provides real-time visibility into all enforcement activity across every layer.
 
-### Neural Mirror: Monitoring Agent Trajectories
+**Access:** `https://sentinul.app` (production) or `http://localhost:5173` (local development)
 
-```python
-from sentinul import NeuralMirror, Dashboard
+| Panel | Data Source | Purpose |
+|---|---|---|
+| Global Health Score | `/api/v1/genesis/health` | Composite governance health; drops with EMERGENCY events |
+| Live Pulse | `/api/v1/genesis/pulse` (SSE) | Real-time stream of all enforcement events |
+| Proxy Call Log | `/api/v1/genesis/proxy/calls` | Per-call inspection results and block phases |
+| Proxy Stats | `/api/v1/genesis/proxy/stats` | Block rate, intent flag rate, routing violations |
+| Response Alerts | `/api/v1/genesis/response-scan/alerts` | QUARANTINE and CRITICAL Response Binder findings |
+| Chain Sequences | `/api/v1/genesis/chain/sequences` | Detected multi-turn attack sequences |
+| Routing Anomalies | `/api/v1/genesis/routing/anomalies` | Model substitution violations and lock expirations |
 
-# Initialize mirror for multiple agents
-mirrors = {
-    "analyst-1": NeuralMirror(agent_id="analyst-1"),
-    "analyst-2": NeuralMirror(agent_id="analyst-2"),
-    "analyst-3": NeuralMirror(agent_id="analyst-3"),
-}
+To consume the governance SSE stream directly:
 
-# Periodic health check (run every 60 seconds)
-def monitor_trajectories():
-    for agent_id, mirror in mirrors.items():
-        status = mirror.get_status()
-        
-        if status.drift_from_baseline > 0.15:
-            print(f"🚨 {agent_id}: Drift alert - {status.drift_from_baseline:.2%}")
-            Dashboard.log_anomaly(agent_id, status)
-            notify_operator(f"Agent {agent_id} behavior diverging")
-        else:
-            print(f"✅ {agent_id}: Nominal (drift {status.drift_from_baseline:.2%})")
-
-# Schedule this to run continuously
-import schedule
-schedule.every(60).seconds.do(monitor_trajectories)
+```bash
+curl -N https://your-backend/api/v1/genesis/pulse \
+  -H "Authorization: Bearer <JWT>"
 ```
 
-**Configuration in `.sentinulrc`:**
+Events emitted on the stream:
 
-```json
-{
-  "pillars": {
-    "neural_mirror": {
-      "trajectory_dimensions": 50,
-      "baseline_consistency_threshold": 0.95,
-      "drift_alert_threshold": 0.15,
-      "update_frequency_ms": 100,
-      "vector_algorithm": "cosine_similarity"
-    }
-  }
-}
-```
-
-### Intent Binder: Commitment Enforcement
-
-```python
-from sentinul import IntentBinder
-from datetime import datetime, timedelta
-
-binder = IntentBinder(agent_id="data-analyst-prod")
-
-class OperationWorkflow:
-    def commit_operation(self, operation_name, params):
-        """Stage 1: Agent commits to action"""
-        intent = binder.bind_intent(
-            action=operation_name,
-            parameters=params,
-            reason="Scheduled compliance report",
-            ttl=3600  # 1 hour to execute
-        )
-        print(f"📝 Intent bound: {intent.id}")
-        print(f"Signature: {intent.signature[:20]}...")
-        return intent
-
-    def verify_and_execute(self, intent_id):
-        """Stage 2: Verify commitment before execution"""
-        verification = binder.verify(intent_id)
-        
-        if not verification.signature_valid:
-            raise RuntimeError("❌ Intent signature invalid - possible tampering")
-        
-        if verification.expired:
-            raise RuntimeError("❌ Intent expired - must rebind with fresh signature")
-        
-        print(f"✅ Intent verified, executing operation...")
-        return execute_operation(intent_id)
-
-workflow = OperationWorkflow()
-intent = workflow.commit_operation("export_report", {"format": "pdf", "size": "full"})
-workflow.verify_and_execute(intent.id)
-```
-
-**Configuration in `.sentinulrc`:**
-
-```json
-{
-  "pillars": {
-    "intent_binder": {
-      "algorithm": "RSA-2048",
-      "hash_function": "SHA-256",
-      "ttl_default_seconds": 3600,
-      "heartbeat_interval_seconds": 10,
-      "signature_verification_required": true
-    }
-  }
-}
-```
-
-### Swarm Immunity: Consensus Decision-Making
-
-```python
-from sentinul import SwarmImmunity
-from typing import Dict, List
-
-class SwarmDecisionEngine:
-    def __init__(self, agent_id: str, swarm_size: int = 15):
-        self.swarm = SwarmImmunity(agent_id=agent_id, swarm_size=swarm_size)
-    
-    def safe_high_risk_operation(self, operation: Dict) -> bool:
-        """Execute operation only with swarm consensus"""
-        
-        print(f"🔄 Requesting swarm consensus for: {operation['name']}")
-        
-        consensus = self.swarm.request_consensus(
-            proposal=operation,
-            timeout_seconds=30,
-            required_majority=0.67  # 2/3 peers must agree
-        )
-        
-        print(f"📊 Consensus results: {consensus.votes_for}/{consensus.total_peers} peers approved")
-        
-        if consensus.verdict == "ALLOW":
-            print(f"✅ Operation approved - executing")
-            return True
-        else:
-            print(f"❌ Operation blocked by swarm")
-            print(f"Reasons: {consensus.reason_summary}")
-            return False
-
-# Example usage
-engine = SwarmDecisionEngine(agent_id="analyst-prod", swarm_size=15)
-
-operation = {
-    "name": "bulk_delete_records",
-    "table": "staging_db.temp_users",
-    "count": 5000,
-    "retention_days_exceeded": 90
-}
-
-if engine.safe_high_risk_operation(operation):
-    perform_bulk_delete()
-```
-
-**Configuration in `.sentinulrc`:**
-
-```json
-{
-  "pillars": {
-    "swarm_immunity": {
-      "gossip_protocol": "epidemic",
-      "propagation_latency_ms": 150,
-      "peer_discovery": "dns-srv",
-      "consensus_algorithm": "simple_majority",
-      "required_quorum_percent": 67,
-      "heartbeat_interval_seconds": 5
-    }
-  }
-}
-```
-
-### Recursive Auditor: Reasoning Chain Analysis
-
-```python
-from sentinul import RecursiveAuditor
-from typing import List
-
-class ReasoningValidator:
-    def __init__(self, agent_id: str):
-        self.auditor = RecursiveAuditor(agent_id=agent_id)
-    
-    def validate_operation(self, declared_intent: str, reasoning_steps: List[str]) -> bool:
-        """Analyze reasoning to ensure it matches declared intent"""
-        
-        analysis = self.auditor.analyze_reasoning(
-            declared_intent=declared_intent,
-            reasoning_steps=reasoning_steps
-        )
-        
-        print(f"🔍 Analyzing reasoning chain for: {declared_intent}")
-        print(f"Confidence: {analysis.confidence:.1%}")
-        
-        if analysis.deviation_detected:
-            print(f"⚠️ DEVIATION DETECTED")
-            print(f"Expected: {analysis.expected_path}")
-            print(f"Observed: {analysis.observed_path}")
-            print(f"Deviation: {analysis.detected_deviation}")
-            
-            # Escalate to human operator
-            self.auditor.request_mfa_approval(
-                reason=f"Reasoning deviation: {analysis.detected_deviation}"
-            )
-            return False
-        
-        print(f"✅ Reasoning valid - matches declared intent")
-        return True
-
-# Usage
-validator = ReasoningValidator(agent_id="analyst-prod")
-
-reasoning = [
-    "Step 1: Filter users by country=US",
-    "Step 2: Calculate age from DOB",
-    "Step 3: Filter age > 18",
-    "Step 4: Export to compliance report",
-]
-
-if validator.validate_operation(
-    declared_intent="Generate adult user list for marketing",
-    reasoning_steps=reasoning
-):
-    execute_export()
-```
-
-**Configuration in `.sentinulrc`:**
-
-```json
-{
-  "pillars": {
-    "recursive_auditor": {
-      "analysis_depth": 10,
-      "cycle_time_ms": 10,
-      "reasoning_chain_capture": true,
-      "deviation_threshold_percent": 5,
-      "mfa_escalation_enabled": true
-    }
-  }
-}
-```
+- `PROXY_CALL_BLOCKED`
+- `CHAIN_DETECTION_VIOLATION`
+- `RESPONSE_BINDER_VIOLATION`
+- `ROUTING_INTEGRITY_VIOLATION`
+- `MANDATE_VIOLATION`
+- `AGENT_QUARANTINED`
 
 ---
 
-## BYOK: Bring Your Own Key Integration
+## 5. API Reference
 
-Genesis Sovereignty includes built-in customer-managed key (BYOK) support for organizations requiring full key sovereignty.
+### Proxy Adapter
 
-### How BYOK Works
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/v1/genesis/proxy/call` | Execute a guarded LLM call through all enforcement layers |
+| `GET` | `/api/v1/genesis/proxy/stats` | Aggregate call statistics: block rate, flags, violations |
+| `GET` | `/api/v1/genesis/proxy/calls` | Recent call log, newest-first (`?limit=&offset=`) |
 
-1. **Your Organization** manages the master encryption key (never sent to Sentinul)
-2. **Sentinul Agent** uses your key to seal sensitive operations
-3. **Unsealing** happens on your infrastructure only
-4. **Audit Trail** remains available without key material visibility
+### Response Binder
 
-### Setup: Configure Your KMS Provider
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/v1/genesis/response-scan` | Scan an LLM response for injection and hijacking signals |
+| `GET` | `/api/v1/genesis/response-scan/stats` | Verdict breakdown and block rate |
+| `GET` | `/api/v1/genesis/response-scan/alerts` | Recent QUARANTINE and CRITICAL findings |
 
-#### Option A: Local KMS (Development/Testing)
+### Routing Validator
 
-```json
-{
-  "vault": {
-    "provider": "local",
-    "key_id": "env.SENTINUL_BYOK_ID",
-    "mode": "sovereign",
-    "algorithm": "HMAC-SHA256"
-  }
-}
-```
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/v1/genesis/routing/lock` | Issue a pre-call cryptographic model routing lock |
+| `POST` | `/api/v1/genesis/routing/verify` | Verify post-response model identity against the lock |
+| `GET` | `/api/v1/genesis/routing/stats` | Verification statistics and violation count |
+| `GET` | `/api/v1/genesis/routing/anomalies` | Recent routing violations |
 
-```bash
-# Generate local key
-export SENTINUL_BYOK_ID=$(openssl rand -hex 32)
+### Chain Detector
 
-# Start Sentinul with local key management
-NODE_ENV=development node src/app.js
-```
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/v1/genesis/chain/event` | Record a behavioral event for a session |
+| `GET` | `/api/v1/genesis/chain/sequences` | Detected chain attack sequences, newest-first |
+| `GET` | `/api/v1/genesis/chain/stats` | Aggregate chain detection statistics |
 
-#### Option B: AWS KMS (Production)
+### Identity and Permissions
 
-```json
-{
-  "vault": {
-    "provider": "aws-kms",
-    "key_id": "env.AWS_KMS_KEY_ARN",
-    "region": "us-east-1",
-    "mode": "sovereign"
-  }
-}
-```
+| Method | Path | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/v1/identity/mint` | Internal | Mint a task-scoped identity token |
+| `POST` | `/api/v1/identity/verify` | Internal | Verify an identity token |
+| `POST` | `/api/v1/permissions/request` | Internal | Request JIT permission for a resource |
+| `POST` | `/api/v1/permissions/revoke` | Internal | Snap-shut: immediately revoke a permission |
+| `GET` | `/api/v1/permissions/active` | Internal | List active permissions |
 
-```bash
-# Set AWS credentials and key
-export AWS_KMS_KEY_ARN="arn:aws:kms:us-east-1:123456789:key/12345678"
-export AWS_ACCESS_KEY_ID="AKIA..."
-export AWS_SECRET_ACCESS_KEY="..."
-
-node src/app.js
-```
-
-#### Option C: Azure Key Vault (Production)
-
-```json
-{
-  "vault": {
-    "provider": "azure-keyvault",
-    "key_id": "env.AZURE_KEY_VAULT_URL",
-    "mode": "sovereign"
-  }
-}
-```
-
-```bash
-# Set Azure credentials
-export AZURE_KEY_VAULT_URL="https://mykeyvalut.vault.azure.net/"
-export AZURE_CLIENT_ID="..."
-export AZURE_CLIENT_SECRET="..."
-export AZURE_TENANT_ID="..."
-
-node src/app.js
-```
-
-### Using BYOK in Your Application
-
-```python
-from sentinul import BYOKVault
-from sentinul.pillars import IntentBinder
-
-# Initialize BYOK vault (reads from .sentinulrc)
-vault = BYOKVault()
-
-# Seal sensitive operation with customer-managed key
-sensitive_operation = {
-    "agent_id": "data-analyst-prod",
-    "action": "export_pii_data",
-    "scope": "customers_table",
-    "rows": 10000
-}
-
-sealed = vault.seal(payload=sensitive_operation)
-print(f"Sealed operation ID: {sealed['operation_id']}")
-# Key material NEVER visible in logs or API responses
-
-# Later: Verify sealed operation
-verification = vault.verify(sealed['envelope'])
-if verification['status'] == 'sovereign-ok':
-    print("✅ Operation verified - safe to execute")
-    execute_export()
-```
-
-### BYOK Health Check
-
-```bash
-# Check BYOK vault status via API
-curl http://localhost:5000/api/health \
-  -H "Authorization: Bearer YOUR_KEY"
-
-# Response includes BYOK status:
-{
-  "status": "healthy",
-  "pillars": {
-    "neural_mirror": "active",
-    "intent_binder": "active",
-    "swarm_immunity": "active",
-    "recursive_auditor": "active",
-    "byok_vault": {
-      "provider": "aws-kms",
-      "status": "active",
-      "connectivity": "ok",
-      "last_seal": "2026-03-16T14:32:00Z",
-      "operations_sealed": 1247
-    }
-  },
-  "metrics": {
-    "health_score": 95,
-    "swarm_latency_ms": 142,
-    "vectors_defended": "4/4"
-  }
-}
-```
-
-### BYOK Compliance Features
-
-| Compliance Standard | BYOK Capability |
-|:---|:---|
-| **SOC2 Type II** | ✅ Cryptographic evidence of customer key control |
-| **HIPAA** | ✅ Customer-managed encryption for PHI |
-| **GDPR** | ✅ Data residency + customer key retention |
-| **PCI-DSS** | ✅ Key separation + audit trail signing |
+> **Internal routes** require the `X-Internal-Service-Key` header and are not reachable by external callers. The key is validated with a constant-time comparison to prevent timing-based enumeration.
 
 ---
 
+## 6. Security Mandate
 
+### Zero-Trust by Architecture
 
-### sentinul_policy.yaml Setup
+Sentinul operates on the principle that no agent, tool, or LLM provider is trusted by default. Trust is not established at connection time — it is re-evaluated at every layer, on every call.
+
+The enforcement pipeline is:
+
+**Fail-closed.** A system error in an enforcement component does not cause the call to proceed unexamined. Non-fatal bridge errors (e.g., neural mirror initialization failure) are logged at ERROR severity; the call continues with a degraded-mode record. The absence of a verdict is itself a recorded state, not a silent pass.
+
+**Deterministic.** For any given input, the enforcement decision is identical on every invocation. There is no probabilistic acceptance threshold that can be gamed with repeated requests.
+
+**Non-bypassable.** There is no runtime flag, request header, or body parameter that disables any enforcement layer. Security-relevant identity fields (`agentId`, cryptographic lock tokens) are never accepted from the request body — they are always derived server-side from `req.user.id` or authenticated session context.
+
+### Sovereign Workflow
+
+The Sovereign Workflow is the operational contract every deployment must honor:
+
+1. No LLM call reaches a provider without passing all pre-call enforcement layers.
+2. No LLM response reaches an agent without passing the Response Binder.
+3. Every enforcement event is recorded, immutable, and available for audit in real-time.
+4. An agent session accumulates behavioral state across turns. A pattern of individually sub-threshold events will collectively trigger Chain Detection and session quarantine.
+5. API keys are secrets, not parameters. They are resolved server-side from environment variables. A caller cannot route a call to a provider using a key it controls via the request body.
+
+### Protecting the Proprietary Moat
+
+The detection logic within the Skill Scanner, Intent Binder, Chain Detector, and Response Binder constitutes **Proprietary Sovereign Logic**. The enforcement contracts — verdicts, block phases, audit trails, and SSE events — are fully observable. The detection logic is not.
+
+This is intentional. An adversary who can enumerate detection thresholds can optimize attacks to stay below them. Black-box enforcement is the appropriate posture for a security-critical control plane. Observable inputs and outputs; opaque decision internals.
+
+---
+
+## 7. Configuration
+
+### Required Environment Variables
+
+| Variable | Minimum | Purpose |
+|---|---|---|
+| `JWT_SECRET` | 64 chars | Signs all session and identity JWTs. Fatal if absent. |
+| `INTERNAL_SERVICE_KEY` | 32 chars | Guards internal control-plane routes. Fatal if absent. |
+| `ENCRYPTION_KEY` | 32 chars | MFA and at-rest encryption. Fatal if absent or too short. |
+
+Generate secure values:
+
+```bash
+node -e "const c=require('crypto'); console.log(c.randomBytes(64).toString('hex'));"
+```
+
+### Optional
+
+| Variable | Purpose |
+|---|---|
+| `OPENAI_API_KEY` | Auto-selected for `api.openai.com` endpoints |
+| `ANTHROPIC_API_KEY` | Auto-selected for `api.anthropic.com` endpoints |
+| `GEMINI_API_KEY` | Auto-selected for `generativelanguage.googleapis.com` endpoints |
+| `LLM_API_KEY` | Generic fallback for any OpenAI-compatible endpoint |
+| `SWARM_SECRET` | HMAC secret for Swarm Immunity gossip protocol signing |
+| `INSTANCE_ID` | Node identifier in multi-instance deployments |
+| `NODE_ENV` | Set to `production` to enforce strict SSRF rules and suppress debug output |
+
+### RSA Key Loading
+
+RSA signing keys are loaded in priority order:
+
+1. `/etc/secrets/` — Render production secrets mount
+2. `/app/` — Docker volume mount
+3. `./keys/` — Local development directory
+4. `RSA_PRIVATE_KEY` / `RSA_PUBLIC_KEY` environment variables
+
+If keys are unavailable in production, startup emits a CRITICAL warning. In development, the platform operates in mock-signing mode with console indication.
+
+---
+
+## 8. BYOK (Bring Your Own Key)
+
+The BYOK Vault enables enterprise operators to supply Customer-Managed Keys (CMK) for at-rest encryption of audit records and evidence vault entries. The vault bridge reads configuration from `.sentinulrc` on startup.
 
 ```yaml
-# Global settings (apply to all agents)
-global:
-  version: "5.0.0"
-  created_at: "2026-03-15T00:00:00Z"
-  
-  # Default action if tool not explicitly mentioned
-  default_action: "allow"
-  
-  # Require MFA for tools with risk > threshold
-  mfa_threshold: 75
-  
-  # Require agents to identify with Skill ID
-  require_identity: true
-  
-  # Audit all tool calls (SOC2 compliant)
-  audit_all_calls: true
-
-# Tools allowed by default
-allowed_tool_patterns:
-  - "^read_.*$"           # All read operations
-  - "^query_.*$"          # All queries
-  - "^analyze_.*$"        # All analysis
-  - "^generate_report_.*$"
-
-# Tools blocked by default
-blocked_tool_patterns:
-  - "^delete_.*$"         # No deletion
-  - "^admin_.*$"          # No admin commands
-  - "^system_.*$"         # No system-level
-  - "^override_.*$"       # No overrides
-
-# Specific tool policies (override defaults)
-tool_policies:
-  write_database:
-    action: "mfa"                    # Requires operator approval
-    risk_score: 80
-    requires_mfa: true
-  
-  send_email:
-    action: "audit"                  # Allow but log
-    risk_score: 40
+# .sentinulrc
+vault:
+  provider: local        # options: local | aws-kms | gcp-kms
+  key_id: "cmk-prod-001"
 ```
 
-### Environment Variables
-
-```bash
-# .env file
-POLICY_FILE=sentinul_policy.yaml
-VAULT_PATH=./data/evidence_vault.db
-DEBUG=false
-LOG_LEVEL=info
-
-# Optional: Remote policy server
-POLICY_SERVER_URL=https://policy.company.internal
-POLICY_UPDATE_INTERVAL=300  # Seconds
-
-# Optional: Slack alerts
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-ALERT_THRESHOLD=high  # low|medium|high|critical
-
-# Optional: Security center integration
-SECURITY_CENTER_API_KEY=sk-abc123...
-SEND_METRICS=true
-```
+The vault bridge fails loudly on initialization errors in production — it does not silently fall back to a platform-managed key. In development, it initializes in sovereign mock mode and logs the mode explicitly.
 
 ---
 
-## Troubleshooting
+*Dedicated to the engineering spirit of Edward Vrona & the Hubble team.*  
+*Beyond Guardrails. Real-Time Sovereignty.*
 
-### Common Issues
 
-#### ❌ Policy not loading
-
-```
-ERROR:root:Error loading policy: 'charmap' codec can't decode byte
-```
-
-**Solution:** Policy file has encoding issue
-
-```bash
-# Fix encoding (convert to UTF-8)
-file sentinul_policy.yaml
-# Result: ASCII text, with no line terminators
-
-# Regenerate policy
-python -c "import yaml; yaml.dump(yaml.safe_load(open('sentinul_policy.yaml')), open('sentinul_policy.yaml', 'w'), encoding='utf-8')"
-```
-
-#### ❌ Vault database locked
-
-```
-sqlite3.OperationalError: database is locked
-```
-
-**Solution:**  Another process has the database open
-
-```bash
-# Check who's using it
-lsof ./data/evidence_vault.db
-
-# If safe to kill
-pkill -f "evidence_vault"
-
-# Or restart container
-docker restart sentinul
-```
-
-#### ❌ Honeypot registry frozen error
-
-```
-RuntimeError: Cannot register - registry frozen after initialization
-```
-
-**Solution:** Registry is immutable after startup (intended security feature)
-
-```python
-# Correct: Register during initialization
-@app.before_first_request()
-def setup():
-    registry = get_shadow_registry()
-    # Register all skills here
-    
-# Incorrect: Trying to register at runtime
-@app.route("/add_skill")
-def add_skill():
-    registry.register(skill)  # ❌ Too late, frozen
-```
-
-#### ❌ Tests failing
-
-```bash
-# Run diagnostic
-python src/GLOBAL_V5_INTEGRATION_TEST_FINAL.py --verbose
-
-# Check each phase individually
-python src/PHASE_4_FINAL_TEST.py -k test_01_policy_loading
-
-# View full output
-python src/GLOBAL_V5_INTEGRATION_TEST_FINAL.py 2>&1 | tee test_output.log
-```
-
----
-
-## Version Migration Guide
-
-### Upgrading from V1 → V5
-
-**V1 users:** You have basic static analysis. Upgrade to get:
-- ✅ Digital verification (prove fixes work)
-- ✅ Honeypot detection (catch jailbreak attempts)
-- ✅ Fleet management (govern 50+ agents)
-- ✅ Compliance reporting (SOC2/HIPAA/GDPR/PCI)
-
-```bash
-# Backup your existing scans
-cp -r ./data ./data.v1.backup
-
-# Upgrade
-git pull origin main
-pip install -r requirements.txt
-
-# Migrate policy format
-python scripts/migrate_v1_to_v5.py ./data.v1.backup
-
-# Restart
-python src/app.py
-```
-
-### Upgrading from V3 → V5
-
-**V3 users:** You have honeypot detection. V5 adds:
-- ✅ Centralized governance (policy hot-reload)
-- ✅ Fleet optimization (<12ms latency)
-- ✅ Security hardening (6 audit findings fixed)
-
-```bash
-# No data migration needed, fully backward compatible
-git pull origin main
-
-# Restart (pulling latest code)
-python src/app.py
-```
-
----
-
-## Support & Resources
-
-### Documentation
-
-| Document | Focus |
-|----------|-------|
-| [TWIN-CORE-PROTOCOL.md](./TWIN-CORE-PROTOCOL.md) | How verification works |
-| [MULTI-AGENT-SECURITY.md](./MULTI-AGENT-SECURITY.md) | CrewAI/AutoGen/LangGraph security |
-| [COMPLIANCE-MAPPING.md](./COMPLIANCE-MAPPING.md) | SOC2/HIPAA/GDPR/PCI mapping |
-| [GETTING-STARTED.md](./GETTING-STARTED.md) | Step-by-step tutorials |
-
-### Running Locally
-
-| Command | Purpose |
-|---------|---------|
-| `python src/app.py` | Start backend |
-| `cd sentinul-app-site && npm run dev` | Start frontend |
-| `python src/PHASE_4_FINAL_TEST.py` | Test governance |
-| `python src/GLOBAL_V5_INTEGRATION_TEST_FINAL.py` | Test all phases |
-
-### Deployment Checklist
-
-- [ ] Read [TWIN-CORE-PROTOCOL.md](./TWIN-CORE-PROTOCOL.md) (5 min)
-- [ ] Run local integration tests (1 min)
-- [ ] Configure `sentinul_policy.yaml` (5 min)
-- [ ] Set env variables in `.env` (2 min)
-- [ ] Deploy to production
-- [ ] Monitor dashboard at `/dashboard` (ongoing)
-
-### Status
-
-Current Build: **Sentinul V5.0.0 (Production Ready)**
-
-```
-Phase 1: Protocol Guard ..................... ✅ OPERATIONAL
-Phase 2: Evidence Vault ..................... ✅ OPERATIONAL
-Phase 3: Honeypot Mesh ..................... ✅ OPERATIONAL
-Phase 4: Universal Governance .............. ✅ OPERATIONAL
-
-Integration Tests: 8/8 PASSING ✅
-Security Audit: All 6 findings fixed ✅
-Production Deployment: APPROVED ✅
-```
 
 ---
 
